@@ -9,9 +9,13 @@ import seaborn as sns
 import joypy
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
-import os
+import os, logging
+for handler in logging.root.handlers[:]:
+    logging.root.removeHandler(handler)
 
 BASE_DIR = "/home/pdaniel/wave-stats"
+logging.basicConfig(filename='{}/wave-log.log'.format(BASE_DIR), level=logging.DEBUG)
+
 
 def get_buoy_data(buoy_id):
     ''' Generate a url request string based on the CDIP thredds '''
@@ -156,8 +160,7 @@ def make_density_plots(buoy_lookup):
     ax[-1].set_xticks(range(0,26,5))
     ax[-1].tick_params(direction='out', length=0)
     ax[-1].tick_params(axis="x", pad=-25)
-
-    plt.title('Distribution of Wave Height, Past 30 Days',y=.8)
+    plt.title('Distribution of Wave Height, Past 30 Days\n {} to {}'.format(df.index.min(),df.index.max()),y=.8)
     fname = os.path.join(BASE_DIR,'figures','hs_distro_feet.png')
     plt.savefig(fname,dpi=300,bbox_inches='tight', pad_inches=0.25)
     copy_file_to_webserver(fname)
